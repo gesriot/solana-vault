@@ -1,0 +1,19 @@
+[features]
+seeds = true
+skip-lint = false
+
+[programs.localnet]
+vault = "31mDBe7jLM8UVoqfBCUpC5yKsijh3uoKekKgRR1Z7VCJ"
+
+[programs.devnet]
+vault = "31mDBe7jLM8UVoqfBCUpC5yKsijh3uoKekKgRR1Z7VCJ"
+
+[registry]
+url = "https://api.apr.dev"
+
+[provider]
+cluster = "Localnet"
+wallet = "~/.config/solana/id.json"
+
+[scripts]
+test = "npx ts-mocha -p ./tsconfig.json -t 1000000 tests/**/*.ts"

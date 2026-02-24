@@ -1,0 +1,25 @@
+[licenses]
+allow = [
+  "Apache-2.0",
+  "Apache-2.0 WITH LLVM-exception",
+  "MIT",
+  "MPL-2.0",
+  "ISC",
+  "Unicode-DFS-2016",
+]
+confidence-threshold = 0.8
+
+[advisories]
+db-path   = "~/.cargo/advisory-db"
+db-urls   = ["https://github.com/rustsec/advisory-db"]
+unmaintained = "warn"
+yanked       = "warn"
+
+[bans]
+multiple-versions = "warn"
+wildcards         = "deny"
+
+[sources]
+unknown-registry  = "deny"
+unknown-git       = "deny"
+allow-registry    = ["https://github.com/rust-lang/crates.io-index"]
