@@ -1,6 +1,6 @@
 # solana-vault · v0.1.0
 
-> **Portfolio Project C — Web3 Track**  
+> **Web3 Track**  
 > Solana Anchor program: secure SPL-token vault with delegate access.
 
 ---
