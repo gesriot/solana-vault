@@ -14,6 +14,13 @@ db-path   = "~/.cargo/advisory-db"
 db-urls   = ["https://github.com/rustsec/advisory-db"]
 unmaintained = "warn"
 yanked       = "warn"
+# Ignore advisories for transitive deps pinned by Solana SDK / Anchor
+ignore = [
+  # curve25519-dalek timing variability (pinned by solana-sdk 1.18.x)
+  "RUSTSEC-2024-0344",
+  # ed25519-dalek double public key signing oracle attack (pinned by solana-sdk 1.18.x)
+  "RUSTSEC-2022-0093",
+]
 
 [bans]
 multiple-versions = "warn"

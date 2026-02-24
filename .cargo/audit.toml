@@ -1,0 +1,9 @@
+# Ignore advisories for transitive dependencies pinned by Solana SDK / Anchor
+# that cannot be updated without upgrading the entire Solana toolchain.
+[advisories]
+ignore = [
+    # curve25519-dalek timing variability (pinned by solana-sdk 1.18.x)
+    "RUSTSEC-2024-0344",
+    # ed25519-dalek double public key signing oracle attack (pinned by solana-sdk 1.18.x)
+    "RUSTSEC-2022-0093",
+]
