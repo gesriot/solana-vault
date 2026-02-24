@@ -2,6 +2,7 @@
 name = "vault"
 version = "0.1.0"
 description = "Solana Anchor Vault — portfolio project C"
+license = "MIT"
 edition = "2021"
 
 [lib]
