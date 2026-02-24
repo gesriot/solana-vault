@@ -10,10 +10,6 @@ allow = [
 confidence-threshold = 0.8
 
 [advisories]
-db-path   = "~/.cargo/advisory-db"
-db-urls   = ["https://github.com/rustsec/advisory-db"]
-unmaintained = "warn"
-yanked       = "warn"
 # Ignore advisories for transitive deps pinned by Solana SDK / Anchor
 ignore = [
   # curve25519-dalek timing variability (pinned by solana-sdk 1.18.x)
