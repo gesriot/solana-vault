@@ -51,14 +51,15 @@ pub fn handler(ctx: Context<Deposit>, amount: u64) -> Result<()> {
     let cpi_ctx = CpiContext::new(
         ctx.accounts.token_program.to_account_info(),
         Transfer {
-            from:      ctx.accounts.owner_ata.to_account_info(),
-            to:        ctx.accounts.vault_ata.to_account_info(),
+            from: ctx.accounts.owner_ata.to_account_info(),
+            to: ctx.accounts.vault_ata.to_account_info(),
             authority: ctx.accounts.owner.to_account_info(),
         },
     );
     token::transfer(cpi_ctx, amount)?;
 
-    vault.total_deposited = vault.total_deposited
+    vault.total_deposited = vault
+        .total_deposited
         .checked_add(amount)
         .ok_or(VaultError::Overflow)?;
     vault.locked = false;
@@ -72,6 +73,10 @@ pub fn handler(ctx: Context<Deposit>, amount: u64) -> Result<()> {
         timestamp: clock.unix_timestamp,
     });
 
-    msg!("[vault] deposit amount={} total_deposited={}", amount, vault.total_deposited);
+    msg!(
+        "[vault] deposit amount={} total_deposited={}",
+        amount,
+        vault.total_deposited
+    );
     Ok(())
 }

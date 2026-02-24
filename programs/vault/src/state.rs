@@ -33,7 +33,7 @@ impl VaultState {
         + 32 + 32 + 32          // owner, mint, vault_ata
         + 8 + 8                 // total_deposited, total_withdrawn
         + 8 + 8 + 8 + 8        // max_deposit, daily_withdraw_limit, withdrawn_today, window_start
-        + 1 + 1;                // bump, locked
+        + 1 + 1; // bump, locked
 }
 
 /// Per-delegate record (PDA, seeds = [b"delegate", vault, delegate_pubkey])

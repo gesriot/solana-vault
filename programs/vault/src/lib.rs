@@ -43,11 +43,7 @@ pub mod vault {
     }
 
     /// Grant a delegate capped, time-limited withdraw authority.
-    pub fn add_delegate(
-        ctx: Context<AddDelegate>,
-        allowance: u64,
-        expires_at: i64,
-    ) -> Result<()> {
+    pub fn add_delegate(ctx: Context<AddDelegate>, allowance: u64, expires_at: i64) -> Result<()> {
         delegate::add_handler(ctx, allowance, expires_at)
     }
 

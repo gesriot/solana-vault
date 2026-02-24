@@ -31,30 +31,30 @@ pub struct CloseVault<'info> {
 }
 
 pub fn handler(ctx: Context<CloseVault>) -> Result<()> {
-    let vault    = &ctx.accounts.vault_state;
-    let clock    = Clock::get()?;
+    let vault = &ctx.accounts.vault_state;
+    let clock = Clock::get()?;
 
     let owner_key = vault.owner;
-    let mint_key  = vault.mint;
-    let bump      = vault.bump;
-    let seeds     = &[b"vault", owner_key.as_ref(), mint_key.as_ref(), &[bump]];
-    let signer    = &[&seeds[..]];
+    let mint_key = vault.mint;
+    let bump = vault.bump;
+    let seeds = &[b"vault", owner_key.as_ref(), mint_key.as_ref(), &[bump]];
+    let signer = &[&seeds[..]];
 
     // Close the ATA and return rent to owner
     let cpi_ctx = CpiContext::new_with_signer(
         ctx.accounts.token_program.to_account_info(),
         CloseAccount {
-            account:     ctx.accounts.vault_ata.to_account_info(),
+            account: ctx.accounts.vault_ata.to_account_info(),
             destination: ctx.accounts.owner.to_account_info(),
-            authority:   ctx.accounts.vault_state.to_account_info(),
+            authority: ctx.accounts.vault_state.to_account_info(),
         },
         signer,
     );
     token::close_account(cpi_ctx)?;
 
     emit!(VaultClosed {
-        vault:     ctx.accounts.vault_state.key(),
-        owner:     owner_key,
+        vault: ctx.accounts.vault_state.key(),
+        owner: owner_key,
         timestamp: clock.unix_timestamp,
     });
 

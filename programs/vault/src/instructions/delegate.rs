@@ -43,24 +43,31 @@ pub fn add_handler(ctx: Context<AddDelegate>, allowance: u64, expires_at: i64) -
     require!(allowance > 0, VaultError::ZeroAmount);
 
     let clock = Clock::get()?;
-    require!(expires_at > clock.unix_timestamp, VaultError::DelegateExpired);
+    require!(
+        expires_at > clock.unix_timestamp,
+        VaultError::DelegateExpired
+    );
 
     let rec = &mut ctx.accounts.delegate_record;
-    rec.vault      = ctx.accounts.vault_state.key();
-    rec.delegate   = ctx.accounts.delegate.key();
-    rec.allowance  = allowance;
-    rec.used       = 0;
+    rec.vault = ctx.accounts.vault_state.key();
+    rec.delegate = ctx.accounts.delegate.key();
+    rec.allowance = allowance;
+    rec.used = 0;
     rec.expires_at = expires_at;
-    rec.bump       = ctx.bumps.delegate_record;
+    rec.bump = ctx.bumps.delegate_record;
 
     emit!(DelegateAdded {
-        vault:      ctx.accounts.vault_state.key(),
-        delegate:   rec.delegate,
+        vault: ctx.accounts.vault_state.key(),
+        delegate: rec.delegate,
         allowance,
         expires_at,
     });
 
-    msg!("[vault] delegate added={} allowance={}", rec.delegate, allowance);
+    msg!(
+        "[vault] delegate added={} allowance={}",
+        rec.delegate,
+        allowance
+    );
     Ok(())
 }
 
@@ -97,7 +104,7 @@ pub struct RemoveDelegate<'info> {
 
 pub fn remove_handler(ctx: Context<RemoveDelegate>) -> Result<()> {
     emit!(DelegateRemoved {
-        vault:    ctx.accounts.vault_state.key(),
+        vault: ctx.accounts.vault_state.key(),
         delegate: ctx.accounts.delegate.key(),
     });
     msg!("[vault] delegate removed={}", ctx.accounts.delegate.key());
@@ -153,9 +160,12 @@ pub fn withdraw_handler(ctx: Context<DelegateWithdraw>, amount: u64) -> Result<(
     require!(amount > 0, VaultError::ZeroAmount);
 
     let clock = Clock::get()?;
-    let rec   = &mut ctx.accounts.delegate_record;
+    let rec = &mut ctx.accounts.delegate_record;
 
-    require!(clock.unix_timestamp < rec.expires_at, VaultError::DelegateExpired);
+    require!(
+        clock.unix_timestamp < rec.expires_at,
+        VaultError::DelegateExpired
+    );
 
     let new_used = rec.used.checked_add(amount).ok_or(VaultError::Overflow)?;
     require!(new_used <= rec.allowance, VaultError::AllowanceExceeded);
@@ -163,41 +173,49 @@ pub fn withdraw_handler(ctx: Context<DelegateWithdraw>, amount: u64) -> Result<(
     let vault_state_ai = ctx.accounts.vault_state.to_account_info();
     let vault = &mut ctx.accounts.vault_state;
     require!(!vault.locked, VaultError::VaultLocked);
-    require!(ctx.accounts.vault_ata.amount >= amount, VaultError::InsufficientFunds);
+    require!(
+        ctx.accounts.vault_ata.amount >= amount,
+        VaultError::InsufficientFunds
+    );
 
     vault.locked = true;
-    rec.used     = new_used;
+    rec.used = new_used;
 
     let owner_key = vault.owner;
-    let mint_key  = vault.mint;
-    let bump      = vault.bump;
-    let seeds     = &[b"vault", owner_key.as_ref(), mint_key.as_ref(), &[bump]];
-    let signer    = &[&seeds[..]];
+    let mint_key = vault.mint;
+    let bump = vault.bump;
+    let seeds = &[b"vault", owner_key.as_ref(), mint_key.as_ref(), &[bump]];
+    let signer = &[&seeds[..]];
 
     let cpi_ctx = CpiContext::new_with_signer(
         ctx.accounts.token_program.to_account_info(),
         Transfer {
-            from:      ctx.accounts.vault_ata.to_account_info(),
-            to:        ctx.accounts.delegate_ata.to_account_info(),
+            from: ctx.accounts.vault_ata.to_account_info(),
+            to: ctx.accounts.delegate_ata.to_account_info(),
             authority: vault_state_ai,
         },
         signer,
     );
     token::transfer(cpi_ctx, amount)?;
 
-    vault.total_withdrawn = vault.total_withdrawn
+    vault.total_withdrawn = vault
+        .total_withdrawn
         .checked_add(amount)
         .ok_or(VaultError::Overflow)?;
     vault.locked = false;
 
     emit!(WithdrawMade {
-        vault:       vault.key(),
-        recipient:   ctx.accounts.delegate_signer.key(),
+        vault: vault.key(),
+        recipient: ctx.accounts.delegate_signer.key(),
         amount,
         by_delegate: true,
-        timestamp:   clock.unix_timestamp,
+        timestamp: clock.unix_timestamp,
     });
 
-    msg!("[vault] delegate_withdraw delegate={} amount={}", rec.delegate, amount);
+    msg!(
+        "[vault] delegate_withdraw delegate={} amount={}",
+        rec.delegate,
+        amount
+    );
     Ok(())
 }

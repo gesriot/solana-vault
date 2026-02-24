@@ -10,7 +10,6 @@ import * as fc from "fast-check";
 import * as anchor from "@coral-xyz/anchor";
 import { Program, BN } from "@coral-xyz/anchor";
 import { Vault } from "../target/types/vault";
-import { expect } from "chai";
 import {
   createTestMint,
   fundAta,
