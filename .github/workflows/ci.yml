@@ -67,14 +67,26 @@ jobs:
       - name: Install Solana CLI
         run: |
           sh -c "$(curl -sSfL https://release.solana.com/v${{ env.SOLANA_VERSION }}/install)"
-          echo "$HOME/.local/share/solana/install/active_release/bin" >> $GITHUB_PATH
+          SOLANA_BIN="$HOME/.local/share/solana/install/active_release/bin"
+          if [ ! -x "$SOLANA_BIN/solana-keygen" ]; then
+            KEYGEN_PATH="$(find "$HOME/.local/share/solana/install" -type f -name solana-keygen -path "*/bin/solana-keygen" -print -quit)"
+            if [ -z "$KEYGEN_PATH" ]; then
+              echo "solana-keygen was not found after Solana CLI install"
+              exit 1
+            fi
+            SOLANA_BIN="$(dirname "$KEYGEN_PATH")"
+          fi
+          echo "$SOLANA_BIN" >> "$GITHUB_PATH"
+          echo "SOLANA_BIN=$SOLANA_BIN" >> "$GITHUB_ENV"
+          "$SOLANA_BIN/solana" --version
+          "$SOLANA_BIN/solana-keygen" --version
 
       - name: Install Anchor CLI
         run: |
           cargo install --git https://github.com/coral-xyz/anchor --tag v${{ env.ANCHOR_VERSION }} anchor-cli --force
 
       - name: Generate test wallet
-        run: solana-keygen new --no-bip39-passphrase -o ~/.config/solana/id.json
+        run: "$SOLANA_BIN/solana-keygen" new --no-bip39-passphrase -o ~/.config/solana/id.json
 
       - name: Install JS deps
         run: npm ci
