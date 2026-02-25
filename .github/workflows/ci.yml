@@ -66,8 +66,8 @@ jobs:
 
       - name: Install Solana CLI
         run: |
-          sh -c "$(curl -sSfL https://release.solana.com/v$SOLANA_VERSION/install)"
-          SOLANA_BIN="$HOME/.local/share/solana/install/active_release/bin"
+          cargo install --locked solana-cli --version "$SOLANA_VERSION"
+          SOLANA_BIN="$HOME/.cargo/bin"
           export PATH="$SOLANA_BIN:$PATH"
           echo "$SOLANA_BIN" >> "$GITHUB_PATH"
           solana --version
