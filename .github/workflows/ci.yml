@@ -109,7 +109,9 @@ jobs:
         run: npm ci
 
       - name: anchor build
-        run: anchor build
+        run: |
+          rm -f Cargo.lock
+          anchor build
 
       - name: anchor test
         run: anchor test --skip-build
