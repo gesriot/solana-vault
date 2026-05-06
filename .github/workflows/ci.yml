@@ -15,7 +15,7 @@ jobs:
   # ── 1. Rust checks ────────────────────────────────────────────────────────────
   rust-checks:
     name: Rust lint + audit
-    runs-on: macos-15
+    runs-on: macos-15-intel
     steps:
       - uses: actions/checkout@v4
 
@@ -31,7 +31,7 @@ jobs:
         run: cargo fmt --all -- --check
 
       - name: clippy
-        run: cargo clippy --all-targets --all-features -- -D warnings
+        run: cargo clippy --workspace --all-targets --all-features -- -D warnings
 
       - name: Install cargo-deny
         run: cargo install cargo-deny --version 0.19.4 --locked
@@ -48,7 +48,7 @@ jobs:
   # ── 2. Build + test ───────────────────────────────────────────────────────────
   anchor-test:
     name: Anchor build + test
-    runs-on: macos-15
+    runs-on: macos-15-intel
     needs: rust-checks
     steps:
       - uses: actions/checkout@v4
@@ -69,7 +69,10 @@ jobs:
       - name: Install Solana CLI
         run: |
           sh -c "$(curl -sSfL https://release.solana.com/v${SOLANA_VERSION}/install)"
-          echo "$HOME/.local/share/solana/install/active_release/bin" >> $GITHUB_PATH
+          SOLANA_BIN="$HOME/.local/share/solana/install/active_release/bin"
+          test -x "$SOLANA_BIN/solana"
+          "$SOLANA_BIN/solana" --version
+          echo "$SOLANA_BIN" >> $GITHUB_PATH
 
       - name: Install Anchor CLI
         run: |
@@ -105,7 +108,7 @@ jobs:
   # ── 3. ESLint ─────────────────────────────────────────────────────────────────
   eslint:
     name: ESLint
-    runs-on: macos-15
+    runs-on: macos-15-intel
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
