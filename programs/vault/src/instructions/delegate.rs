@@ -188,7 +188,7 @@ pub fn withdraw_handler(ctx: Context<DelegateWithdraw>, amount: u64) -> Result<(
     let signer = &[&seeds[..]];
 
     let cpi_ctx = CpiContext::new_with_signer(
-        ctx.accounts.token_program.to_account_info(),
+        ctx.accounts.token_program.key(),
         Transfer {
             from: ctx.accounts.vault_ata.to_account_info(),
             to: ctx.accounts.delegate_ata.to_account_info(),

@@ -49,7 +49,7 @@ pub fn handler(ctx: Context<Deposit>, amount: u64) -> Result<()> {
     vault.locked = true;
 
     let cpi_ctx = CpiContext::new(
-        ctx.accounts.token_program.to_account_info(),
+        ctx.accounts.token_program.key(),
         Transfer {
             from: ctx.accounts.owner_ata.to_account_info(),
             to: ctx.accounts.vault_ata.to_account_info(),

@@ -1,4 +1,4 @@
-#![allow(unexpected_cfgs)]
+#![allow(unexpected_cfgs, clippy::diverging_sub_expression)]
 
 //! # Vault — Solana Anchor Program
 //!

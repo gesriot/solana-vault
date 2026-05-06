@@ -7,8 +7,8 @@
  * Trident framework or similar tools.
  */
 import * as fc from "fast-check";
-import * as anchor from "@coral-xyz/anchor";
-import { Program, BN } from "@coral-xyz/anchor";
+import * as anchor from "@anchor-lang/core";
+import { Program, BN } from "@anchor-lang/core";
 import { Vault } from "../target/types/vault";
 import {
   createTestMint,

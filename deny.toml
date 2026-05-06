@@ -12,22 +12,9 @@ allow = [
 confidence-threshold = 0.8
 
 [advisories]
-# Ignore advisories for transitive deps pinned by Solana SDK / Anchor
 ignore = [
-  # curve25519-dalek timing variability (pinned by solana-sdk 1.18.x)
-  "RUSTSEC-2024-0344",
-  # ed25519-dalek double public key signing oracle attack (pinned by solana-sdk 1.18.x)
-  "RUSTSEC-2022-0093",
-  # atty unmaintained (pinned by solana-sdk 1.18.x -> solana-logger -> env_logger)
-  "RUSTSEC-2024-0375",
-  # bincode unmaintained (pinned by solana-sdk 1.18.x / anchor-lang)
+  # bincode unmaintained (pinned by solana-program / anchor-lang)
   "RUSTSEC-2025-0141",
-  # derivative unmaintained (pinned by solana-program -> ark-ff/ark-ec)
-  "RUSTSEC-2024-0388",
-  # paste unmaintained (pinned by solana-program -> ark-ff)
-  "RUSTSEC-2024-0436",
-  # libsecp256k1 unmaintained (pinned by solana-program / solana-sdk 1.18.x)
-  "RUSTSEC-2025-0161",
 ]
 
 [bans]
