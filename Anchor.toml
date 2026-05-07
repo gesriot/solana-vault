@@ -12,5 +12,8 @@ vault = "31mDBe7jLM8UVoqfBCUpC5yKsijh3uoKekKgRR1Z7VCJ"
 cluster = "Localnet"
 wallet = "~/.config/solana/id.json"
 
+[test]
+startup_wait = 10000
+
 [scripts]
 test = "node node_modules/ts-mocha/bin/ts-mocha -p ./tsconfig.json -t 1000000 tests/**/*.ts"

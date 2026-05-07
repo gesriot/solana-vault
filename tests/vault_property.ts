@@ -16,7 +16,7 @@ import {
   deriveVaultPDA,
   getTokenBalance,
 } from "./helpers";
-import { Keypair } from "@solana/web3.js";
+import { Keypair, LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js";
 import { getAssociatedTokenAddress } from "@solana/spl-token";
 
 // Pure logic extracted from on-chain state helpers — tested without RPC
@@ -34,6 +34,22 @@ function dailyLimitCheck(
   if (limit === 0) return true;
   const next = withdrawn + amount;
   return next <= limit;
+}
+
+async function airdropAndConfirm(
+  conn: anchor.web3.Connection,
+  pubkey: PublicKey
+): Promise<void> {
+  const sig = await conn.requestAirdrop(pubkey, 2 * LAMPORTS_PER_SOL);
+  const latestBlockhash = await conn.getLatestBlockhash();
+  await conn.confirmTransaction(
+    {
+      signature: sig,
+      blockhash: latestBlockhash.blockhash,
+      lastValidBlockHeight: latestBlockhash.lastValidBlockHeight,
+    },
+    "confirmed"
+  );
 }
 
 describe("vault property tests", () => {
@@ -91,8 +107,7 @@ describe("vault property tests", () => {
           fc.nat({ max: 500_000 }).filter((n) => n > 0),
           async (amount) => {
             const owner = Keypair.generate();
-            await conn.requestAirdrop(owner.publicKey, 2e9);
-            await new Promise((r) => setTimeout(r, 500));
+            await airdropAndConfirm(conn, owner.publicKey);
 
             const mint = await createTestMint(conn, payer);
             const ownerAta = await fundAta(
@@ -167,8 +182,7 @@ describe("vault property tests", () => {
           }),
           async (amounts) => {
             const owner = Keypair.generate();
-            await conn.requestAirdrop(owner.publicKey, 2e9);
-            await new Promise((r) => setTimeout(r, 500));
+            await airdropAndConfirm(conn, owner.publicKey);
 
             const mint = await createTestMint(conn, payer);
             const ownerAta = await fundAta(
