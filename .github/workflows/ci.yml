@@ -112,7 +112,7 @@ jobs:
         run: npm install
 
       - name: anchor build
-        run: anchor build
+        run: anchor build --ignore-keys
 
       - name: anchor test
         run: anchor test --skip-build
