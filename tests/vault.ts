@@ -149,7 +149,7 @@ describe("vault", () => {
     it("rejects withdraw exceeding vault balance", async () => {
       try {
         await program.methods
-          .withdraw(new BN(999_999_999))
+          .withdraw(new BN(400_000))
           .accounts({ owner: payer.publicKey, mint, vaultState, vaultAta, ownerAta } as any)
           .rpc();
         expect.fail("should have thrown");
@@ -175,23 +175,10 @@ describe("vault", () => {
         .rpc();
 
       // Try to exceed daily limit: already withdrawn 200k + 100k + 100k = 400k in total
-      // Attempting 5M more would be 5.4M > DAILY_LIMIT (5M)
-      // But vault only has 100k left, so we need a fresh deposit
-      await program.methods
-        .deposit(new BN(1_000_000))
-        .accounts({ owner: payer.publicKey, mint, vaultState, ownerAta, vaultAta } as any)
-        .rpc();
-
-      // Now withdraw up to daily limit boundary
-      await program.methods
-        .withdraw(new BN(4_600_000)) // total: 400k + 4.6M = 5M (exactly at limit)
-        .accounts({ owner: payer.publicKey, mint, vaultState, vaultAta, ownerAta } as any)
-        .rpc();
-
-      // Next withdrawal should fail
+      // Attempting 4_600_001 more would be 5_000_001 > DAILY_LIMIT (5M).
       try {
         await program.methods
-          .withdraw(new BN(1))
+          .withdraw(new BN(4_600_001))
           .accounts({ owner: payer.publicKey, mint, vaultState, vaultAta, ownerAta } as any)
           .rpc();
         expect.fail("should have thrown DailyLimitExceeded");

@@ -115,7 +115,7 @@ jobs:
         run: anchor build --ignore-keys
 
       - name: anchor test
-        run: anchor test --skip-build
+        run: anchor test --skip-build --validator legacy
 
       - name: Upload IDL artifact
         uses: actions/upload-artifact@v4

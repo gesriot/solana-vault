@@ -7,7 +7,7 @@ import {
 import { Keypair, PublicKey, Connection } from "@solana/web3.js";
 
 export const PROGRAM_ID = new PublicKey(
-  "Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS"
+  "31mDBe7jLM8UVoqfBCUpC5yKsijh3uoKekKgRR1Z7VCJ"
 );
 
 export async function createTestMint(

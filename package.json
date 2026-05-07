@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "scripts": {
     "build": "anchor build",
-    "test":  "anchor test",
-    "lint":  "eslint \"tests/**/*.ts\""
+    "test":  "anchor test --validator legacy",
+    "lint":  "node node_modules/eslint/bin/eslint.js \"tests/**/*.ts\""
   },
   "dependencies": {
     "@anchor-lang/core": "^1.0.2",
