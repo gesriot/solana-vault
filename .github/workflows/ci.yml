@@ -57,7 +57,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: npm
 
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
@@ -110,7 +109,7 @@ jobs:
           solana-keygen new --no-bip39-passphrase -o ~/.config/solana/id.json
 
       - name: Install JS deps
-        run: npm ci
+        run: npm install
 
       - name: anchor build
         run: anchor build
@@ -133,6 +132,5 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: npm
-      - run: npm ci
+      - run: npm install
       - run: npm run lint
