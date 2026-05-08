@@ -48,7 +48,7 @@ jobs:
   # ── 2. Build + test ───────────────────────────────────────────────────────────
   anchor-test:
     name: Anchor build + test
-    runs-on: macos-15
+    runs-on: ubuntu-latest
     needs: rust-checks
     steps:
       - uses: actions/checkout@v4
@@ -70,10 +70,12 @@ jobs:
         run: |
           set -euo pipefail
 
-          case "$(uname -m)" in
-            arm64) target="aarch64-apple-darwin" ;;
-            x86_64) target="x86_64-apple-darwin" ;;
-            *) echo "Unsupported macOS architecture: $(uname -m)" >&2; exit 1 ;;
+          case "$(uname -s)-$(uname -m)" in
+            Darwin-arm64) target="aarch64-apple-darwin" ;;
+            Darwin-x86_64) target="x86_64-apple-darwin" ;;
+            Linux-aarch64 | Linux-arm64) target="aarch64-unknown-linux-gnu" ;;
+            Linux-x86_64) target="x86_64-unknown-linux-gnu" ;;
+            *) echo "Unsupported runner: $(uname -s)-$(uname -m)" >&2; exit 1 ;;
           esac
 
           installer="/tmp/agave-install-init"
