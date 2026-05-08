@@ -16,7 +16,6 @@ import {
   deriveVaultPDA,
   getTokenBalance,
 } from "./helpers";
-import { Keypair, LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js";
 import { getAssociatedTokenAddress } from "@solana/spl-token";
 
 // Pure logic extracted from on-chain state helpers — tested without RPC
@@ -34,22 +33,6 @@ function dailyLimitCheck(
   if (limit === 0) return true;
   const next = withdrawn + amount;
   return next <= limit;
-}
-
-async function airdropAndConfirm(
-  conn: anchor.web3.Connection,
-  pubkey: PublicKey
-): Promise<void> {
-  const sig = await conn.requestAirdrop(pubkey, 2 * LAMPORTS_PER_SOL);
-  const latestBlockhash = await conn.getLatestBlockhash();
-  await conn.confirmTransaction(
-    {
-      signature: sig,
-      blockhash: latestBlockhash.blockhash,
-      lastValidBlockHeight: latestBlockhash.lastValidBlockHeight,
-    },
-    "confirmed"
-  );
 }
 
 describe("vault property tests", () => {
@@ -106,19 +89,16 @@ describe("vault property tests", () => {
         fc.asyncProperty(
           fc.nat({ max: 500_000 }).filter((n) => n > 0),
           async (amount) => {
-            const owner = Keypair.generate();
-            await airdropAndConfirm(conn, owner.publicKey);
-
             const mint = await createTestMint(conn, payer);
             const ownerAta = await fundAta(
               conn,
               payer,
               mint,
-              owner.publicKey,
+              payer.publicKey,
               1_000_000
             );
 
-            const [vaultState] = deriveVaultPDA(owner.publicKey, mint);
+            const [vaultState] = deriveVaultPDA(payer.publicKey, mint);
             const vaultAta = await getAssociatedTokenAddress(
               mint,
               vaultState,
@@ -128,12 +108,11 @@ describe("vault property tests", () => {
             await program.methods
               .initialize(new BN(1_000_000), new BN(10_000_000))
               .accounts({
-                owner: owner.publicKey,
+                owner: payer.publicKey,
                 mint,
                 vaultState,
                 vaultAta,
               } as any)
-              .signers([owner])
               .rpc();
 
             // Deposit
@@ -141,26 +120,24 @@ describe("vault property tests", () => {
             await program.methods
               .deposit(new BN(amount))
               .accounts({
-                owner: owner.publicKey,
+                owner: payer.publicKey,
                 mint,
                 vaultState,
                 ownerAta,
                 vaultAta,
               } as any)
-              .signers([owner])
               .rpc();
 
             // Withdraw same amount
             await program.methods
               .withdraw(new BN(amount))
               .accounts({
-                owner: owner.publicKey,
+                owner: payer.publicKey,
                 mint,
                 vaultState,
                 vaultAta,
                 ownerAta,
               } as any)
-              .signers([owner])
               .rpc();
 
             const balanceAfter = Number(await getTokenBalance(conn, ownerAta));
@@ -181,19 +158,16 @@ describe("vault property tests", () => {
             maxLength: 5,
           }),
           async (amounts) => {
-            const owner = Keypair.generate();
-            await airdropAndConfirm(conn, owner.publicKey);
-
             const mint = await createTestMint(conn, payer);
             const ownerAta = await fundAta(
               conn,
               payer,
               mint,
-              owner.publicKey,
+              payer.publicKey,
               10_000_000
             );
 
-            const [vaultState] = deriveVaultPDA(owner.publicKey, mint);
+            const [vaultState] = deriveVaultPDA(payer.publicKey, mint);
             const vaultAta = await getAssociatedTokenAddress(
               mint,
               vaultState,
@@ -203,12 +177,11 @@ describe("vault property tests", () => {
             await program.methods
               .initialize(new BN(1_000_000), new BN(10_000_000))
               .accounts({
-                owner: owner.publicKey,
+                owner: payer.publicKey,
                 mint,
                 vaultState,
                 vaultAta,
               } as any)
-              .signers([owner])
               .rpc();
 
             let prevTotal = 0;
@@ -216,13 +189,12 @@ describe("vault property tests", () => {
               await program.methods
                 .deposit(new BN(amt))
                 .accounts({
-                  owner: owner.publicKey,
+                  owner: payer.publicKey,
                   mint,
                   vaultState,
                   ownerAta,
                   vaultAta,
                 } as any)
-                .signers([owner])
                 .rpc();
 
               const state = await program.account.vaultState.fetch(vaultState);
